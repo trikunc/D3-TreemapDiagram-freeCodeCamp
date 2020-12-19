@@ -1,6 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
-import { select, hierarchy, treemap, scaleOrdinal } from "d3";
+import {
+  select,
+  hierarchy,
+  treemap,
+  scaleOrdinal,
+  scaleLinear,
+  max,
+  min,
+  mean
+} from "d3";
 
 import { schemeTableau10, schemeSet3 } from "d3-scale-chromatic";
 
@@ -12,6 +21,7 @@ export default function App() {
   // "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json";
   const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [gameValues, setGameValues] = useState([]);
   const svgRef = useRef();
   const legendRef = useRef();
 
@@ -19,7 +29,6 @@ export default function App() {
     fetch(dataSet)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         let hierarchyTree = hierarchy(data)
           .sum((d) => {
             return d.value;
@@ -29,7 +38,6 @@ export default function App() {
           });
 
         treemap().size([1000, 600])(hierarchyTree);
-        setData(hierarchyTree.leaves());
 
         let cat = hierarchyTree.leaves().map(function (nodes) {
           return nodes.data.category;
@@ -39,20 +47,27 @@ export default function App() {
             return self.indexOf(category) === index;
           })
         );
+
+        const consoleGameValue = data.children
+          .map((data) => data.children)
+          .map((gameData) =>
+            gameData.map((gameValues) => parseFloat(gameValues.value))
+          );
+        const gameMean = consoleGameValue.map((value) => mean(value));
+        const maxGameMean = max(gameMean);
+        setGameValues(maxGameMean);
+        setData(hierarchyTree.leaves());
       });
   }, []);
 
   useEffect(() => {
-    const height = 570;
-    const width = 960;
+    console.log(schemeTableau10);
 
-    console.log(data);
+    const minValue = min(data, (d) => parseFloat(d.data.value));
 
-    let color = scaleOrdinal(schemeSet3);
+    let color = scaleOrdinal([...schemeTableau10, ...schemeSet3]);
 
-    let fader = function (color) {
-      return interpolateRgb(color, "#fff")(0.5);
-    };
+    let opacity = scaleLinear().domain([minValue, gameValues]).range([0.75, 1]);
 
     const svg = select(svgRef.current).attr("id", "tree-map");
     let tooltip = select("body").append("div").attr("class", "tooltip");
@@ -88,8 +103,10 @@ export default function App() {
       .attr("fill", (d) => {
         return color(d.data.category);
       })
+      .attr("opacity", (d) => {
+        return opacity(d.data.value);
+      })
       .on("mouseover", function (event, d) {
-        console.log(d);
         let coordinates = [event.pageX, event.pageY];
         select(this).classed("active", true);
 
