@@ -4,14 +4,56 @@
 }
 
 body {
-  display: flex;
-  justify-content: center;
+  /* display: flex; */
+  /* justify-content: center; */
   height: 100vh;
-  padding: 20px 50px 50px;
+  /* padding: 20px 50px 50px; */
   text-align: center;
   background-image: radial-gradient(
     circle 779px at 15% 85%,
-    rgb(182, 243, 245) 0%,
-    rgb(84, 39, 249) 93.6%
+    rgb(200, 224, 240) 0%,
+    rgb(206, 248, 203) 93.6%
   );
+}
+
+.svgContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#tree-map {
+  /* background-color: #1d1f20; */
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+  /* padding: 10px; */
+  /* border-radius: 5px; */
+  min-height: 600px;
+  min-width: 1000px;
+  font: 10px sans-serif;
+  text-align: center;
+  display: block;
+  /* margin: auto; */
+}
+
+#legend {
+  font: 10px sans-serif;
+  text-align: center;
+  display: block;
+  overflow: visible;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  background: gray;
+  color: whitesmoke;
+  box-shadow: 1px 1px 10px;
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+.active {
+  fill: gray;
 }
